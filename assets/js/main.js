@@ -23,25 +23,33 @@
   /* ---------- Mobile nav ---------- */
   const burger = document.querySelector(".burger");
   const mobileNav = document.querySelector(".mobile-nav");
+  const toggleMobileNav = (force) => {
+    if (!burger || !mobileNav) return;
+    const open = force !== undefined ? force : !mobileNav.classList.contains("open");
+    burger.classList.toggle("open", open);
+    mobileNav.classList.toggle("open", open);
+    document.body.style.overflow = open ? "hidden" : "";
+  };
   if (burger && mobileNav) {
-    burger.addEventListener("click", () => {
-      burger.classList.toggle("open");
-      mobileNav.classList.toggle("open");
-      document.body.style.overflow = mobileNav.classList.contains("open") ? "hidden" : "";
-    });
-    mobileNav.querySelectorAll("a").forEach((a) =>
-      a.addEventListener("click", () => {
-        burger.classList.remove("open");
-        mobileNav.classList.remove("open");
-        document.body.style.overflow = "";
-      })
-    );
+    burger.addEventListener("click", () => toggleMobileNav());
+    mobileNav.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => toggleMobileNav(false)));
   }
 
+  /* ---------- Bottom app tab bar: "Menu" opens the same mobile nav overlay ---------- */
+  document.querySelectorAll(".tab-menu-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      toggleMobileNav();
+    });
+  });
+
   /* ---------- Active nav link on scroll ---------- */
-  const navLinks = document.querySelectorAll("nav.primary-nav a[href^='#']");
+  const navLinks = document.querySelectorAll("nav.primary-nav a[href^='#'], .app-tabbar a.tab-link[href^='#']");
   const sections = Array.from(navLinks)
-    .map((l) => document.querySelector(l.getAttribute("href")))
+    .map((l) => {
+      const href = l.getAttribute("href");
+      return href.length > 1 ? document.querySelector(href) : null;
+    })
     .filter(Boolean);
   if (sections.length) {
     const navObserver = new IntersectionObserver(

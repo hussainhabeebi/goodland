@@ -30,6 +30,17 @@ body {
   background: var(--paper);
   overflow-x: hidden;
   line-height: 1.6;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: contain;
+}
+
+/* App-like tap feedback everywhere touch is primary */
+@media (hover: none) {
+  a, button, .exp-card, .gallery-grid figure, .checkbox-item, .amenity-chip {
+    transition: transform .18s var(--ease), opacity .18s var(--ease), box-shadow .18s var(--ease);
+  }
+  a:active, button:active { transform: scale(.96); }
+  .exp-card:active, .gallery-grid figure:active { transform: scale(.98); }
 }
 
 h1, h2, h3, h4 {
@@ -194,13 +205,13 @@ header {
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 1000;
-  padding: 26px 0;
+  padding: calc(26px + env(safe-area-inset-top)) 0 26px;
   transition: background .4s var(--ease), padding .4s var(--ease), box-shadow .4s var(--ease);
 }
 header.scrolled {
   background: rgba(7, 27, 46, .92);
   backdrop-filter: blur(10px);
-  padding: 14px 0;
+  padding: calc(14px + env(safe-area-inset-top)) 0 14px;
   box-shadow: 0 8px 30px -14px rgba(0,0,0,.5);
 }
 .nav-wrap {
@@ -306,8 +317,10 @@ nav.primary-nav a:hover::after, nav.primary-nav a.active::after { width: 100%; }
   align-items: center;
   justify-content: center;
   gap: 30px;
+  padding: calc(20px + env(safe-area-inset-top)) 20px calc(90px + env(safe-area-inset-bottom));
   transform: translateY(-100%);
   transition: transform .5s var(--ease);
+  overflow-y: auto;
 }
 .mobile-nav.open { transform: translateY(0); }
 .mobile-nav a { color: #fff; font-size: 1.4rem; font-family: 'Playfair Display', serif; }
@@ -805,6 +818,66 @@ footer {
   border: 2px solid #21c063;
   animation: pulseRing 2.4s ease-out infinite;
 }
+
+/* ---------------- App bottom tab bar (mobile) ---------------- */
+.app-tabbar {
+  display: none;
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 1150;
+  background: rgba(7, 27, 46, .96);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid rgba(255,255,255,.08);
+  padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
+  box-shadow: 0 -10px 30px -18px rgba(0,0,0,.6);
+}
+.app-tabbar ul {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+}
+.app-tabbar li { flex: 1; display: flex; }
+.app-tabbar a {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 2px;
+  border-radius: 14px;
+  color: #93a9b4;
+  font-size: .66rem;
+  font-weight: 600;
+  letter-spacing: .2px;
+  transition: color .3s, background .3s, transform .25s var(--ease);
+}
+.app-tabbar a svg { width: 22px; height: 22px; stroke-width: 1.8; transition: transform .3s var(--ease); }
+.app-tabbar a.active { color: var(--mist); background: rgba(143,211,232,.1); }
+.app-tabbar a.active svg { transform: translateY(-2px) scale(1.08); }
+.app-tabbar a:active { transform: scale(.92); }
+.app-tabbar .tab-main {
+  color: var(--deep);
+  position: relative;
+}
+.app-tabbar .tab-main .tab-fab {
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 10px 22px -8px rgba(224,166,58,.8);
+  margin-top: -26px;
+  border: 4px solid var(--deep);
+}
+.app-tabbar .tab-main.active { color: var(--gold-soft); }
+.app-tabbar .tab-main svg { width: 22px; height: 22px; color: var(--deep); }
+
+@media (max-width: 768px) {
+  .app-tabbar { display: block; }
+  body { padding-bottom: calc(70px + env(safe-area-inset-bottom)); }
+  .wa-float { bottom: calc(86px + env(safe-area-inset-bottom)); right: 18px; width: 54px; height: 54px; }
+  .wa-float svg { width: 26px; height: 26px; }
+}
 @keyframes pulseWa { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
 @keyframes pulseRing { 0% { transform: scale(1); opacity: .7; } 100% { transform: scale(1.7); opacity: 0; } }
 
@@ -837,8 +910,9 @@ footer {
 }
 
 @media (max-width: 768px) {
-  nav.primary-nav, .nav-actions .btn-outline { display: none; }
+  nav.primary-nav, .nav-actions { display: none; }
   .burger { display: block; }
+  .logo-sub { display: none; }
   .exp-grid { grid-template-columns: 1fr 1fr; }
   .gallery-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 160px; }
   .gallery-grid figure.wide { grid-column: span 2; }
